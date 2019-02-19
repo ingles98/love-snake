@@ -48,6 +48,7 @@ snake.move = function (this,dt)
                 k:onEat(this)
             elseif k.type == "snake" and k ~= this then
                 this:die()
+                return
             end
         end
     end
@@ -111,6 +112,14 @@ snake.die = function(this)
     for k,v in pairs(this.parts) do
         --GRID[v.x][v.y] = 0
         table.removeFromTable(GRID[v.x][v.y], this)
+    end
+
+    for x,_v in ipairs(GRID) do
+        for y,v in ipairs(_v) do
+            if table.tableContains(v, this) then
+                table.removeFromTable(v, this)
+            end
+        end
     end
 
     if this.keyboard_wasd then
