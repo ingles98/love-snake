@@ -19,7 +19,7 @@ love.math.setRandomSeed(os.time())
 SnakeClass = require 'snake'
 FoodClass = require 'food'
 --Snake = SnakeClass:new(love.math.random(1, GRID_W), love.math.random(1, GRID_H))
-
+zxczxc
 SNAKES = {
 }
 
