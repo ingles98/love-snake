@@ -38,22 +38,9 @@ snake.move = function (this,dt)
     this.last_y = this.y
     this.x = this.x + this.dir_x
     this.y = this.y + this.dir_y
-    --GRID[this.last_x][this.last_y] = 0
-    --GRID[this.x][this.y] = this
-
-    if GRID[this.x] and GRID[this.x][this.y] and type(GRID[this.x][this.y]) == "table" then
-        --GRID[this.x][this.y]:onEat(this)
-        for k,v in pairs(GRID[this.x][this.y]) do
-            if k.type == "food" then
-                k:onEat(this)
-            elseif k.type == "snake" and k ~= this then
-                this:die()
-                return
-            end
-        end
-    end
 
     this:checkBoundaries()
+    this:checkGrid()
     table.addToTable(GRID[this.x][this.y], this)
     table.removeFromTable(GRID[this.last_x][this.last_y], this)
 
@@ -65,6 +52,19 @@ snake.move = function (this,dt)
     end
 end
 
+snake.checkGrid = function(this)
+    if GRID[this.x] and GRID[this.x][this.y] and type(GRID[this.x][this.y]) == "table" then
+        for k,v in pairs(GRID[this.x][this.y]) do
+            if k.type == "food" then
+                k:onEat(this)
+            elseif k.type == "snake" and k ~= this then
+                this:die()
+                return
+            end
+        end
+    end
+end
+
 snake.checkBoundaries = function(this)
     if this.x > GRID_W then this.x = 1
     elseif this.x < 1 then this.x = GRID_W end
@@ -73,7 +73,7 @@ snake.checkBoundaries = function(this)
 end
 
 snake.checkParts = function (this)
-    for i = 1, this.length-1 do
+    for i = 1, this.length do
         if this.dead then return end
 
         if not this.parts[i] then
@@ -106,19 +106,15 @@ end
 snake.die = function(this)
     this.dead = true
 
-    --GRID[this.x][this.y] = 0
     table.removeFromTable(GRID[this.x][this.y], this)
 
     for k,v in pairs(this.parts) do
-        --GRID[v.x][v.y] = 0
         table.removeFromTable(GRID[v.x][v.y], this)
     end
 
     for x,_v in ipairs(GRID) do
         for y,v in ipairs(_v) do
-            if table.tableContains(v, this) then
-                table.removeFromTable(v, this)
-            end
+            table.removeFromTable(v, this)
         end
     end
 
@@ -190,14 +186,15 @@ snake.new = function (this, x, y, keys)
 end
 
 snake.draw = function (this)
-    love.graphics.setColor(this.color)
-    love.graphics.rectangle("fill", this.x*TILESIZE + TILESIZE/2 - this.size/2 + (this.rel_x or 0), this.y*TILESIZE + TILESIZE/2 - this.size/2 + (this.rel_y or 0),this.size, this.size)
-
+    local color = this.color
     for k,v in ipairs(this.parts) do
         if v.x and v.y then
+            love.graphics.setColor(color[1]*((#this.parts +1) - k)/#this.parts, color[2]*((#this.parts +1) - k)/#this.parts, color[3]*((#this.parts +1) - k)/#this.parts, 1)
             love.graphics.rectangle("fill", v.x*TILESIZE + TILESIZE/2 - v.size/2 + (v.rel_x or 0), v.y*TILESIZE + TILESIZE/2 - v.size/2 + (v.rel_y or 0),v.size, v.size)
         end
     end
+    love.graphics.setColor(color)
+    love.graphics.rectangle("fill", this.x*TILESIZE + TILESIZE/2 - this.size/2 + (this.rel_x or 0), this.y*TILESIZE + TILESIZE/2 - this.size/2 + (this.rel_y or 0),this.size, this.size)
 end
 
 

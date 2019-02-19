@@ -4,10 +4,11 @@ local fd = {
     y = 0,
     size = TILESIZE*0.5,
     points = 3,
+    color = {1, 0.3, 0.3, 1}
 }
 
-fd.new = function (this, x, y)
-    local o = {x = x, y = y}
+fd.new = function (this, x, y, points)
+    local o = {x = x, y = y, points = points or this.points}
     setmetatable(o, this)
     this.__index = this
     o.__index = this
@@ -17,7 +18,7 @@ fd.new = function (this, x, y)
 end
 
 fd.draw = function(this)
-    love.graphics.setColor(1, 0.3, 0.3, 1)
+    love.graphics.setColor(this.color)
     love.graphics.circle("fill", this.x*TILESIZE + (TILESIZE/2), this.y*TILESIZE + (TILESIZE/2) , this.size/2)
 end
 
